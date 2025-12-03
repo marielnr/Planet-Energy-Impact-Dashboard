@@ -25,7 +25,7 @@ import pycountry #esta libreria pasa de iso a country name
     
     return (float(resp[0]['lat']), float(resp[0]['lon']))
 """
-energy = pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/owid-energy-data.csv')
+energy = pd.read_csv('owid-energy-data.csv')
 energy = energy[
     (energy['year'] == 2001) | 
     (energy['year'] == 2005) | 
@@ -35,7 +35,7 @@ energy = energy[
     (energy['year'] == 2024)
 ][['country', 'energy_per_capita','year']].rename(columns={'country': 'Country', 'energy_per_capita': 'Energy'})
 
-life_exp = pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/life-expectancy.csv')
+life_exp = pd.read_csv('life-expectancy.csv')
 
 life_exp = life_exp[
     (life_exp['Year'] == 2001) |
@@ -46,7 +46,7 @@ life_exp = life_exp[
     (life_exp['Year'] == 2024)
 ][['Entity', 'Period life expectancy at birth','Year']].rename(columns={'Entity': 'Country', 'Period life expectancy at birth': 'LifeExp','Year':'year'})
 
-gdp = pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/gdp-per-capita-worldbank.csv')
+gdp = pd.read_csv('gdp-per-capita-worldbank.csv')
 gdp = gdp[
     (gdp['Year'] == 2001) |
     (gdp['Year'] == 2005) |
@@ -56,7 +56,7 @@ gdp = gdp[
     (gdp['Year'] == 2024) 
 ][['Entity', 'GDP per capita, PPP (constant 2021 international $)','Year']].rename(columns={'Entity': 'Country', 'GDP per capita, PPP (constant 2021 international $)': 'GDP','Year':'year'})
 
-electricity_access=pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/API_acceso_electricidad.csv')
+electricity_access=pd.read_csv('API_acceso_electricidad.csv')
 #los datos que vemos aqui son %of population con access 
 id_vars = ['Country Name', 'Country Code', 'Indicator Name', 'Indicator Code']
 electricity_access_largo = electricity_access.melt(
@@ -75,7 +75,7 @@ electricity_access_largo=electricity_access_largo[
     (electricity_access_largo['year'] == 2024)
     ][['Country Name','year','Access_Percentage']].rename(columns={'Country Name':'Country'})
 
-lights = pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/viirs-nighttime-lights-country.csv')
+lights = pd.read_csv('viirs-nighttime-lights-country.csv')
 iso_codes = lights['iso'].unique()
 
 country_object = pycountry.countries.get(alpha_3='AFG')
@@ -92,7 +92,7 @@ lights['Country'] = lights['iso'].map(iso_to_name_dict)
 lights = lights[
     (lights['year'] == 2015) | (lights['year'] == 2020) | (lights['year'] == 2024)][['Country','year','nlsum']].rename(columns={'nlsum': 'NightLights'})  
 
-tipos_energia=pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/yearly_full_release_long_format.csv')
+tipos_energia=pd.read_csv('yearly_full_release_long_format.csv')
 tipos_energia = tipos_energia.dropna(subset=['Continent'])
 tipos_energia=tipos_energia[['Area','Year','Category','Variable','Unit','Value']].rename(columns={'Area':'Country','Year':'year'})
 tipos_energia['Unique_Variable'] = tipos_energia['Category'] + '_' + tipos_energia['Variable']+'('+tipos_energia['Unit']+')'
@@ -113,7 +113,7 @@ tipos_energia_pivot = tipos_energia_agregada.pivot(
     values='Value'
 ).reset_index()
 
-life_exp_w=pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/API_SP.DYN.LE00.FE.IN_DS2_en_csv_v2_8069.csv')
+life_exp_w=pd.read_csv('API_SP.DYN.LE00.FE.IN_DS2_en_csv_v2_8069.csv')
 life_exp_w_melt=life_exp_w.melt(
     id_vars=['Country Name', 'Country Code', 'Indicator Name', 'Indicator Code'],
     var_name='year',
@@ -127,7 +127,7 @@ life_exp_w_melt=life_exp_w_melt[
     (life_exp_w_melt['year'] == 2020) |
     (life_exp_w_melt['year'] == 2024) ][['Country Name','year','Life Expectancy Female (years)']].rename(columns={'Country Name':'Country'})
 
-life_exp_m=pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/API_SP.DYN.LE00.MA.IN_DS2_en_csv_v2_126205.csv')
+life_exp_m=pd.read_csv('API_SP.DYN.LE00.MA.IN_DS2_en_csv_v2_126205.csv')
 life_exp_m_melt=life_exp_m.melt(
     id_vars=['Country Name', 'Country Code', 'Indicator Name', 'Indicator Code'],
     var_name='year',
@@ -141,7 +141,7 @@ life_exp_m_melt=life_exp_m_melt[
     (life_exp_m_melt['year'] == 2020) |
     (life_exp_m_melt['year'] == 2024) ][['Country Name','year','Life Expectancy Men (years)']].rename(columns={'Country Name':'Country'})
 
-co2=pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/owid-co2-data.csv')
+co2=pd.read_csv('owid-co2-data.csv')
 co2=co2[
     (co2['year'] == 2001) |
     (co2['year'] == 2005) |
@@ -150,7 +150,7 @@ co2=co2[
     (co2['year'] == 2020) |
     (co2['year'] == 2024)][['country','year','co2','co2_per_capita']].rename(columns={'country':'Country'})
 
-gini=pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/economic-inequality-gini-index.csv')
+gini=pd.read_csv('economic-inequality-gini-index.csv')
 gini=gini[
     (gini['Year'] == 2001) |
     (gini['Year'] == 2005) |
@@ -187,7 +187,7 @@ df_geo = world.merge(df, on='Country', how='left')
 df_geo.to_file('data.geojson', driver='GeoJSON')
 
 
-df_geo.to_excel('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/final_data.xlsx', index=False)
+df_geo.to_excel('final_data.xlsx', index=False)
 print("DF final guardado en 'final_data.xlsx'")
 
 """
@@ -219,3 +219,4 @@ folium.LayerControl().add_to(m)
 m.save('mapa_interactivo.html')
 print("Mapa guardado en 'mapa_interactivo.html'")
 """
+
