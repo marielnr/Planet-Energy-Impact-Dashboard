@@ -36,6 +36,7 @@ energy = energy[
 ][['country', 'energy_per_capita','year']].rename(columns={'country': 'Country', 'energy_per_capita': 'Energy'})
 
 life_exp = pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/life-expectancy.csv')
+
 life_exp = life_exp[
     (life_exp['Year'] == 2001) |
     (life_exp['Year'] == 2005) |
@@ -112,12 +113,62 @@ tipos_energia_pivot = tipos_energia_agregada.pivot(
     values='Value'
 ).reset_index()
 
+life_exp_w=pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/API_SP.DYN.LE00.FE.IN_DS2_en_csv_v2_8069.csv')
+life_exp_w_melt=life_exp_w.melt(
+    id_vars=['Country Name', 'Country Code', 'Indicator Name', 'Indicator Code'],
+    var_name='year',
+    value_name='Life Expectancy Female (years)'
+    )
+life_exp_w_melt=life_exp_w_melt[
+    (life_exp_w_melt['year'] == 2001) |
+    (life_exp_w_melt['year'] == 2005) |
+    (life_exp_w_melt['year'] == 2010) |
+    (life_exp_w_melt['year'] == 2015) |
+    (life_exp_w_melt['year'] == 2020) |
+    (life_exp_w_melt['year'] == 2024) ][['Country Name','year','Life Expectancy Female (years)']].rename(columns={'Country Name':'Country'})
+
+life_exp_m=pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/API_SP.DYN.LE00.MA.IN_DS2_en_csv_v2_126205.csv')
+life_exp_m_melt=life_exp_m.melt(
+    id_vars=['Country Name', 'Country Code', 'Indicator Name', 'Indicator Code'],
+    var_name='year',
+    value_name='Life Expectancy Men (years)'
+    )
+life_exp_m_melt=life_exp_m_melt[
+    (life_exp_m_melt['year'] == 2001) |
+    (life_exp_m_melt['year'] == 2005) |
+    (life_exp_m_melt['year'] == 2010) |
+    (life_exp_m_melt['year'] == 2015) |
+    (life_exp_m_melt['year'] == 2020) |
+    (life_exp_m_melt['year'] == 2024) ][['Country Name','year','Life Expectancy Men (years)']].rename(columns={'Country Name':'Country'})
+
+co2=pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/owid-co2-data.csv')
+co2=co2[
+    (co2['year'] == 2001) |
+    (co2['year'] == 2005) |
+    (co2['year'] == 2010) |
+    (co2['year'] == 2015) |
+    (co2['year'] == 2020) |
+    (co2['year'] == 2024)][['country','year','co2','co2_per_capita']].rename(columns={'country':'Country'})
+
+gini=pd.read_csv('C:/Users/marie/OneDrive/Documentos/Maestría/Semestre 2/Visualización de datos/Práctica/DF_2/economic-inequality-gini-index.csv')
+gini=gini[
+    (gini['Year'] == 2001) |
+    (gini['Year'] == 2005) |
+    (gini['Year'] == 2010) |
+    (gini['Year'] == 2015) |
+    (gini['Year'] == 2020) |
+    (gini['Year'] == 2024)][['Entity','Year','Gini coefficient (2021 prices)']].rename(columns={'Entity':'Country','Year':'year','Gini coefficient (2021 prices)':'Gini coefficient'})
+
 #mergee
 df = pd.merge(energy, life_exp, on=['Country','year'], how='inner')
 df = pd.merge(df, gdp, on=['Country','year'], how='inner')
 df = pd.merge(df, lights, on=['Country','year'], how='inner')
 df = pd.merge(df,electricity_access_largo, on=['Country','year'], how='left')
 df = pd.merge(df,tipos_energia_pivot,on=['Country','year'],how='left')
+df = pd.merge(df,life_exp_m_melt, on=['Country','year'], how='left')
+df = pd.merge(df,life_exp_w_melt, on=['Country','year'], how='left')
+df = pd.merge(df,co2,on=['Country','year'],how='left')
+df = pd.merge(df,gini,on=['Country','year'], how='left')
 
 #GeoData (versión actualizada para Geopandas 1.1+) sino no funciona
 url = "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
