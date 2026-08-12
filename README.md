@@ -1,56 +1,86 @@
-# Global Energy, Development, and Inequality (2001–2024)
+# Global Energy, Development & Inequality — Interactive World Map
 
-### Interactive Visualization Inspired by “An Honest & Sensible Conversation about Global Energy” – Scott Tinker
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Pandas](https://img.shields.io/badge/Pandas-150458?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
+[![Folium](https://img.shields.io/badge/Folium-Leaflet-77B829)](https://python-visualization.github.io/folium/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)](https://pandas.pydata.org/)
-[![GeoPandas](https://img.shields.io/badge/GeoPandas-000000?style=for-the-badge&logoColor=white)](https://geopandas.org/)
-[![Folium](https://img.shields.io/badge/Folium-000000?style=for-the-badge&logoColor=white)](https://python-visualization.github.io/folium/quickstart.html)
+An interactive world map that explores how **energy use, human development, CO₂ emissions
+and inequality** relate across countries — inspired by Scott Tinker's *"An Honest & Sensible
+Conversation about Global Energy"*, but driven purely by open data.
+
+**▶ Live demo:** https://marielnr.github.io/Planet-Energy-Impact-Dashboard/
+
+> Hover any country for a full indicator card; use the layer control (top-right) to switch
+> between indicators and between the *Day* (light) and *Night* (dark) base maps.
 
 ---
 
-## Project Description
+## What it shows
 
-This project features an **interactive world map** that explores the complex relationships between **per capita energy consumption**, **human development** (life expectancy, GDP per capita), **inequality** (Gini coefficient), gender perspectives, $\text{CO}_2$ emissions, and the **energy transition** (renewables vs. fossils) from 2001 to 2024.
+For each country in a chosen year, the map exposes:
 
-Inspired by Scott Tinker's 2022 talk, this visualization is updated to 2024, enriched with new variables (gender-disaggregated data, Gini, $\text{CO}_2$), and remains bias-free: driven purely by data.
+| Indicator | Source |
+| :-- | :-- |
+| Energy use per capita | Our World in Data (OWID) — energy |
+| GDP per capita (PPP) | World Bank / OWID |
+| Life expectancy (total, female, male) | OWID + World Bank |
+| CO₂ emissions per capita | OWID — CO₂ |
+| Electricity access (% of population) | World Bank |
+| Gini coefficient | OWID |
+| Night-time lights (economic-activity proxy) | NASA/NOAA VIIRS |
 
-## Key Features
+Everything is keyed on **ISO-3166 alpha-3 country codes**, which is what makes the merge
+across seven differently-formatted sources reliable (the earlier version relied on a
+hand-maintained country-name mapping).
 
-* Over **80 variables** per country and year.
-* **6 key years:** 2001 • 2005 • 2010 • 2015 • 2020 • 2024.
-* **VIIRS nighttime lights** (NASA/NOAA) as a proxy for nighttime economic activity.
-* Life expectancy **disaggregated by gender** (World Bank).
-* Gini coefficient (OWID).
-* Total and per capita $\text{CO}_2$ emissions (OWID).
-* Capacity and generation by source (coal, gas, hydro, solar, wind, nuclear, bioenergy…).
-* Map with Day/Night layers (OpenStreetMap + CartoDB Dark Matter).
-* **Interactive tooltip** with all key indicators.
+## How it's built
 
-**Live demo (once deployed):**
-→ `https://your-username.github.io/your-repo/interactive_map.html`
+```
+data/*.csv ──▶ build_dataset.py ──▶ final_data.csv ──▶ build_map.py ──▶ index.html
+   (raw)          (merge on iso3+year)   (tidy)            (Folium)      (the map)
+```
 
-## Data Sources (All Updated to 2024)
+## Reproduce it
 
-| Source | Main Variables | Last Update |
-| :--- | :--- | :--- |
-| Our World in Data (OWID) | Energy, $\text{CO}_2$, Gini, renewables, GDP per capita | 2024 |
-| World Bank | Electricity access, life expectancy by gender | 2023-2024 |
-| Ember | Detailed electricity capacity and generation data | 2024 |
-| NASA/NOAA VIIRS | Nighttime lights (`nlsum`) | 2024 |
-| Natural Earth | Country geometries (110m) | – |
+```bash
+pip install -r requirements.txt
+python build_dataset.py     # merge the raw sources  → final_data.csv
+python build_map.py         # render the map         → index.html
+# open index.html in a browser, or:
+python build_map.py --year 2015 --out map_2015.html   # any key year
+```
 
-## Repository Structure
+Key years with broad cross-source coverage: **2001, 2005, 2010, 2015, 2020**
+(VIIRS night-lights begin in 2012, so they populate 2015 and 2020).
+
+## Repository structure
 
 ```text
 .
+├── build_dataset.py      # merge raw sources → final_data.csv (pandas only)
+├── build_map.py          # final_data.csv + geometry → index.html (Folium)
+├── final_data.csv        # tidy country-year output (1,450 rows, 290 countries)
+├── index.html            # the interactive map (also the GitHub Pages site)
 ├── data/
-│   ├── raw/               ← Original CSVs (not uploaded due to size)
-│   └── processed/
-│       ├── data.geojson   ← Final file for the map
-│       └── final_data.xlsx
-├── notebooks/
-│   └── 01_preprocessing.ipynb   ← Full code for merging and cleaning
-├── interactive_map.html         ← Final visualization (open in browser!)
+│   ├── owid-energy-data.csv, owid-co2-data.csv
+│   ├── life-expectancy.csv, gdp-per-capita-worldbank.csv
+│   ├── economic-inequality-gini-index.csv
+│   ├── API_acceso_electricidad.csv           (World Bank, wide format)
+│   ├── API_SP.DYN.LE00.{FE,MA}.IN_*.csv       (life expectancy by sex)
+│   ├── viirs-nighttime-lights-country.csv
+│   └── world-countries.json                   (ISO-3 keyed geometry, vendored)
 ├── requirements.txt
-└── README.md
+└── LICENSE
+```
+
+## Notes & limitations
+
+- Data sources are committed as a **fixed snapshot** so the map is reproducible; refresh
+  the CSVs from the providers to update it.
+- The by-source electricity **generation/capacity** breakdown (Ember) is out of scope for
+  this snapshot — the indicators above are what the committed data supports.
+
+## Author
+
+**Mariel Nava Rodríguez** — released under the [MIT License](LICENSE).
